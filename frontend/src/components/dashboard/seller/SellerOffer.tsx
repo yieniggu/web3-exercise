@@ -18,12 +18,7 @@ export interface Offer {
   status: string;
 }
 
-export const SellerOffer = ({
-  id,
-  USDXAmount,
-  MSTKAmount,
-  status,
-}: Offer) => {
+export const SellerOffer = ({ id, USDXAmount, MSTKAmount, status }: Offer) => {
   const [pendingTransaction, setPendingTransaction] = useState(false);
 
   const { writeContractAsync, status: writeStatus } = useWriteContract();
@@ -45,19 +40,23 @@ export const SellerOffer = ({
     });
     console.log("has: ", transactionHash);
 
-    // update data in backend
-    const updateTxResult = await axios.put(
-      `http://kima-test-backend-gejiebfvhq-uc.a.run.app/history/transactions/${id}`,
-      {
-        sellerTransactionHash: transactionHash,
-        status: "accepted",
+    const data = JSON.stringify({
+      sellerTransactionHash: transactionHash,
+      status: "accepted",
+    });
+
+    const reqConfig = {
+      method: "put",
+      maxBodyLength: Infinity,
+      url: `https://kima-test-backend-gejiebfvhq-uc.a.run.app/history/transactions/${id}`,
+      headers: {
+        "Content-Type": "application/json",
       },
-      {
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-      }
-    );
+      data: data,
+    };
+
+    // update data in backend
+    const updateTxResult = await axios.request(reqConfig);
 
     console.log("updateTxResult: ", updateTxResult);
     setPendingTransaction(false);
@@ -83,8 +82,12 @@ export const SellerOffer = ({
         </div>
       )}
 
-      {status === "accepted" || status === "finalized" && (
+      {status === "accepted" && (
         <p className="text-green-400 text-end">Accepted</p>
+      )}
+
+      {status === "finalized" && (
+        <p className="text-green-400 text-end">Finalized</p>
       )}
     </div>
   );

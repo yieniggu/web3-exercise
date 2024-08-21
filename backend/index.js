@@ -9,6 +9,7 @@ dbConnection();
 
 app.use(express.json());
 app.use(cors());
+app.options('*', cors())
 
 app.use("/buyer", require("./routes/buyer"))
 // app.use("/seller", require("./routes/seller"))

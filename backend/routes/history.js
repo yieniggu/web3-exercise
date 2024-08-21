@@ -4,8 +4,11 @@ const {
   getTransactions,
   updateTransaction,
 } = require("../controllers/history");
+const { setCorsHeaders } = require("../middlewares/crossOrigin");
 
 const router = new Router();
+
+router.use(setCorsHeaders);
 
 router.get("/token-transfers", getTokenTransfers);
 router.get("/transactions", getTransactions);

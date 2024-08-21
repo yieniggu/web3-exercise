@@ -38,21 +38,25 @@ export const Buy = () => {
     });
     console.log("has: ", transactionHash);
 
-    // store data in backend
-    const recordTxResult = await axios.post(
-      "http://kima-test-backend-gejiebfvhq-uc.a.run.app/buyer/buy",
-      {
-        transactionHash: transactionHash,
-        USDXAmount: USDX,
-        MSTKAmount: USDX / 10,
-        status: "awaitingSeller",
+    const data = JSON.stringify({
+      "transactionHash": transactionHash,
+      "USDXAmount": USDX,
+      "MSTKAmount": USDX/10,
+      "status": "awaitingSeller"
+    });    
+
+    const reqConfig = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'https://kima-test-backend-gejiebfvhq-uc.a.run.app/buyer/buy',
+      headers: { 
+        'Content-Type': 'application/json'
       },
-      {
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-      }
-    );
+      data : data
+    };
+
+    // store data in backend
+    const recordTxResult = await axios.request(reqConfig);
 
     console.log("recordTxResult: ", recordTxResult);
     setPendingTransaction(false);

@@ -7,10 +7,13 @@ export const SellerOffers = () => {
 
   useEffect(() => {
     const getTransactions = async () => {
-      
-      const { data } = await axios.get(
-        "http://kima-test-backend-gejiebfvhq-uc.a.run.app/history/transactions"
-      );
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: "https://kima-test-backend-gejiebfvhq-uc.a.run.app/history/transactions",
+      };
+
+      const { data } = await axios.request(config);
 
       const { transactions } = data;
       setSalesRequests(transactions);

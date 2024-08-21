@@ -25,10 +25,15 @@ export const BrokerOffer = ({
     buyerTransactionHash: "",
     sellerTransactionHash: "",
     brokerBuyerTransactionHash: "",
-    brokerSellerTransactionHash: ""
+    brokerSellerTransactionHash: "",
   });
 
-  const { buyerTransactionHash, sellerTransactionHash, brokerBuyerTransactionHash, brokerSellerTransactionHash } = transactionHashes;
+  const {
+    buyerTransactionHash,
+    sellerTransactionHash,
+    brokerBuyerTransactionHash,
+    brokerSellerTransactionHash,
+  } = transactionHashes;
 
   const { writeContractAsync, status: writeStatus } = useWriteContract();
 
@@ -37,8 +42,8 @@ export const BrokerOffer = ({
 
     const buyerHash = splittedHash[0];
     const sellerHash = splittedHash.length > 1 ? splittedHash[1] : "";
-    const brokerBuyerHash = splittedHash.length > 2 ? splittedHash[2]: "";
-    const brokerSellerHash = splittedHash.length > 3 ? splittedHash[3]: "";
+    const brokerBuyerHash = splittedHash.length > 2 ? splittedHash[2] : "";
+    const brokerSellerHash = splittedHash.length > 3 ? splittedHash[3] : "";
 
     setTransactionHashes({
       buyerTransactionHash: buyerHash,
@@ -63,6 +68,8 @@ export const BrokerOffer = ({
       hash: txHash,
     });
     console.log("hash: ", transactionHash);
+
+    return transactionHash;
   };
 
   const sendSellerAssets = async () => {
@@ -91,19 +98,29 @@ export const BrokerOffer = ({
       const buyerHash = await sendBuyerAssets();
       const sellerHash = await sendSellerAssets();
 
-      // update data in backend
-      await axios.put(
-        `http://kima-test-backend-gejiebfvhq-uc.a.run.app/history/transactions/${id}`,
-        {
-          sellerTransactionHash: buyerHash + "*" + sellerHash, 
-          status: "finalized",
+      setTransactionHashes({
+        ...transactionHashes,
+        brokerBuyerTransactionHash: buyerHash,
+        brokerSellerTransactionHash: sellerHash,
+      });
+
+      const data = JSON.stringify({
+        sellerTransactionHash: buyerHash + "*" + sellerHash,
+        status: "finalized",
+      });
+
+      const config = {
+        method: "put",
+        maxBodyLength: Infinity,
+        url: `https://kima-test-backend-gejiebfvhq-uc.a.run.app/history/transactions/${id}`,
+        headers: {
+          "Content-Type": "application/json",
         },
-        {
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-        }
-      );
+        data: data,
+      };
+
+      // update data in backend
+      await axios.request(config);
       setPendingTransaction(false);
     } catch {
       setPendingTransaction(false);

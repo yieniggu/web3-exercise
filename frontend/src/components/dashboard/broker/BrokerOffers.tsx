@@ -7,9 +7,13 @@ export const BrokerOffers = () => {
 
   useEffect(() => {
     const getTransactions = async () => {
-      const { data } = await axios.get(
-        "http://kima-test-backend-gejiebfvhq-uc.a.run.app/history/transactions"
-      );
+      const config = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: "https://kima-test-backend-gejiebfvhq-uc.a.run.app/history/transactions",
+      };
+
+      const { data } = await axios.request(config);
 
       const { transactions } = data;
       setBrokerRequests(transactions);
@@ -25,7 +29,9 @@ export const BrokerOffers = () => {
 
   return (
     <div className="flex flex-col mx-auto font-mono gap-4">
-      <h1 className="text-3xl text-blue-700 text-center mt-20">Broker Requests</h1>
+      <h1 className="text-3xl text-blue-700 text-center mt-20">
+        Broker Requests
+      </h1>
       {brokerRequests.map(
         ({
           _id,
